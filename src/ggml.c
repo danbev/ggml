@@ -5818,6 +5818,25 @@ struct ggml_tensor * ggml_out_prod(
     return result;
 }
 
+struct ggml_tensor * ggml_out_prod_no_grad(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,
+        struct ggml_tensor  * b) {
+    GGML_ASSERT(ggml_can_out_prod(a, b));
+    GGML_ASSERT(!ggml_is_transposed(a));
+
+    // a is broadcastable to b for ne[2] and ne[3] -> use b->ne[2] and b->ne[3]
+    const int64_t ne[4] = { a->ne[0], b->ne[0], b->ne[2], b->ne[3] };
+    struct ggml_tensor * result = ggml_new_tensor(ctx, GGML_TYPE_F32, 4, ne);
+
+    result->op   = GGML_OP_OUT_PROD;
+    result->grad = NULL;
+    result->src[0] = a;
+    result->src[1] = b;
+
+    return result;
+}
+
 // ggml_scale
 
 static struct ggml_tensor * ggml_scale_impl(
@@ -18526,7 +18545,7 @@ static void ggml_compute_backward(struct ggml_context * ctx, struct ggml_tensor 
                 // necessary for llama
                 if (src0->grad) {
                     struct ggml_tensor * s1_tg =
-                        ggml_out_prod(ctx, // [n,m,qq,rr]
+                        ggml_out_prod_no_grad(ctx, // [n,m,qq,rr]
                             src1,          // [n,p,qq,rr]
                             tensor->grad); // [m,p,qq,rr]
                     const int64_t qq = s1_tg->ne[2];
@@ -18557,7 +18576,7 @@ static void ggml_compute_backward(struct ggml_context * ctx, struct ggml_tensor 
                                 // // when src0 is bigger than tensor->grad (this is mostly the case in llama),
                                 // // avoid transpose of src0, rather transpose smaller tensor->grad
                                 // // and then use ggml_out_prod
-                                ggml_out_prod(ctx,                  // [n,p,qq,rr]
+                                ggml_out_prod_no_grad(ctx,                  // [n,p,qq,rr]
                                     src0,                           // [n,m,q1,r1]
                                     ggml_transpose(ctx,             // [p,m,qq,rr]
                                         tensor->grad)),             // [m,p,qq,rr]

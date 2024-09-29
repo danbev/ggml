@@ -1214,6 +1214,18 @@ extern "C" {
             struct ggml_tensor  * a,
             struct ggml_tensor  * b);
 
+    // Computes the outer product of two tensors without a gradient.
+    // This can be useful for operations that are not directly part of the
+    // gradient computation.
+    //
+    // A: m columns, n rows,
+    // B: p columns, n rows,
+    // result is m columns, p rows
+    GGML_API struct ggml_tensor * ggml_out_prod_no_grad(
+            struct ggml_context * ctx,
+            struct ggml_tensor  * a,
+            struct ggml_tensor  * b);
+
     //
     // operations on tensors without backpropagation
     //
