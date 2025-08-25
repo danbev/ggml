@@ -23,7 +23,7 @@ jobs:
       run: cmake --build build --target ggml_package
 
     - name: Create Release
-      uses: softprops/action-gh-release@v2
+      uses: ggml-org/action-create-release@v1
       with:
         files: build/ggml-src.zip
         draft: false
