@@ -3,9 +3,9 @@ project("ggml" C CXX)
 
 ### GGML Version
 set(GGML_VERSION_MAJOR 1)
-set(GGML_VERSION_MINOR 0)
+set(GGML_VERSION_MINOR 1)
 set(GGML_VERSION_PATCH 0)
-set(GGML_VERSION_DEV "")  # "-dev" for development, "" for releases
+set(GGML_VERSION_DEV "-dev")  # "-dev" for development, "" for releases
 set(GGML_VERSION_BASE "${GGML_VERSION_MAJOR}.${GGML_VERSION_MINOR}.${GGML_VERSION_PATCH}")
 
 find_program(GIT_EXE NAMES git git.exe NO_CMAKE_FIND_ROOT_PATH)
